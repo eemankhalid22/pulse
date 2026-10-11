@@ -1,0 +1,31 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "dev": "tsx watch --env-file+.env src/index.ts",
+    "db:push": "prisma db push",
+    "db:seed": "tsc --env-file=.env prisma/seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "@hono/node-server": "^2.1.4",
+    "@hono/zod-openapi": "^1.6.3",
+    "@prisma/client": "^6.19.3",
+    "@scalar/hono-api-reference": "^0.9.48",
+    "bcryptjs": "^3.0.3",
+    "hono": "^4.13.13"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "prisma": "^6.19.3",
+    "tsc": "^2.0.4",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

@@ -1,0 +1,96 @@
+generator client{
+    provider = "prisma-client-js"
+}
+
+datasource db{
+    url =env("DATABASE_URL")
+    provider = "postgresql"
+}
+
+enum Role{
+    VIEWER
+    RESPONDER
+    ADMIN
+}
+
+enum Severity{
+    SEV1
+    SEV2
+    SEV3
+    SEV4
+}
+
+
+enum IncidentStatus{
+    OPEN
+    INVESTIGATING
+    IDENTIFIED
+    MONITORING
+    RESOLVED
+}
+
+model User{
+    id String @id @default(cuid())
+    email String @unique
+    name String
+    passwordHash String
+    role Role @default(VIEWER)
+    createdAt DateTime @default(now())
+    reported Incident[]  @relation("Reporter")
+    assigned Incident[] @relation("Assignee")
+    updates IncidentUpdate[]
+    auditLogs AuditLog[]
+}
+
+model Incident{
+    id String @id @default(cuid())
+    title String
+    description String
+    severity String
+    status String
+    service String
+    reportedId String
+    assigneeId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    resolvedAt DateTime?
+
+    reported User @relation("Reporter", fields:[reportedId], references: [id])
+    assignee User @relation("Assignee", fields: [assigneeId], references: [id])
+    updates IncidentUpdate[]
+    @@index([status,severity])
+    @@index([service])
+    @@index([createdAt])
+    }
+
+    model IncidentUpdate{
+        id String @id @default(cuid())
+        incidentId String
+        authorId String
+        message String
+        fromStatus IncidentStatus?
+        toStatus IncidentStatus?
+        createdAt DateTime @default(now())
+
+        incident Incident @relation(fields: [incidentId], references: [id])
+        author User @relation(fields: [authorId], references: [id])
+
+
+        @@index([incidentId, createdAt])
+    }
+
+
+    model AuditLog{
+        id String @id @default(cuid())
+        actorId String?
+        action String
+        entityType String
+        entityId String
+        metadata String
+        createdAt DateTime @default(now())
+
+        actor User? @relation(fields: [actorId], references: [id])
+
+        @@index([entityType,entityId])
+        @@index([createdAt])
+        }
