@@ -4,8 +4,9 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { authRoutes } from "./routes/auth";
 import { incidentRoutes } from "./routes/incidents";
-import type { AppEnv } from "./auth";
 import { notificationRoutes } from "./routes/notifications";
+import { statsRoutes } from "./routes/stats";
+import type { AppEnv } from "./auth";
 
 export const app = new OpenAPIHono<AppEnv>();
 
@@ -17,6 +18,7 @@ app.get("/health", (c) => c.json({ status: "ok" }));
 app.route("/", authRoutes);
 app.route("/", incidentRoutes);
 app.route("/", notificationRoutes);
+app.route("/", statsRoutes);
 
 app.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
   type: "http",

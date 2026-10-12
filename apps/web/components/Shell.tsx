@@ -48,6 +48,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <Link href="/" className={pathname === "/" ? "active" : ""}>
             Incidents
           </Link>
+          <Link
+            href="/warroom"
+            className={pathname === "/warroom" ? "active" : ""}
+          >
+            War Room
+          </Link>
           {me.role === "ADMIN" && (
             <Link
               href="/admin"
@@ -100,7 +106,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
           Sign out
         </button>
       </header>
-      <main className="container">{children}</main>
+      <main
+        className={pathname === "/warroom" ? "container wide" : "container"}
+      >
+        {children}
+      </main>
       <div className="toasts">
         {toasts.map((t) => (
           <div key={t.id} className="toast">
