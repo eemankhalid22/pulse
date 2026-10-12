@@ -1,96 +1,123 @@
-generator client{
-    provider = "prisma-client-js"
+generator client {
+  provider = "prisma-client-js"
 }
 
-datasource db{
-    url =env("DATABASE_URL")
-    provider = "postgresql"
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
-enum Role{
-    VIEWER
-    RESPONDER
-    ADMIN
+enum Role {
+  VIEWER
+  RESPONDER
+  ADMIN
 }
 
-enum Severity{
-    SEV1
-    SEV2
-    SEV3
-    SEV4
+enum Severity {
+  SEV1
+  SEV2
+  SEV3
+  SEV4
 }
 
-
-enum IncidentStatus{
-    OPEN
-    INVESTIGATING
-    IDENTIFIED
-    MONITORING
-    RESOLVED
+enum IncidentStatus {
+  OPEN
+  INVESTIGATING
+  IDENTIFIED
+  MONITORING
+  RESOLVED
 }
 
-model User{
-    id String @id @default(cuid())
-    email String @unique
-    name String
-    passwordHash String
-    role Role @default(VIEWER)
-    createdAt DateTime @default(now())
-    reported Incident[]  @relation("Reporter")
-    assigned Incident[] @relation("Assignee")
-    updates IncidentUpdate[]
-    auditLogs AuditLog[]
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
 }
 
-model Incident{
-    id String @id @default(cuid())
-    title String
-    description String
-    severity String
-    status String
-    service String
-    reportedId String
-    assigneeId String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    resolvedAt DateTime?
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(VIEWER)
+  createdAt    DateTime @default(now())
 
-    reported User @relation("Reporter", fields:[reportedId], references: [id])
-    assignee User @relation("Assignee", fields: [assigneeId], references: [id])
-    updates IncidentUpdate[]
-    @@index([status,severity])
-    @@index([service])
-    @@index([createdAt])
-    }
+  reported      Incident[]       @relation("Reporter")
+  assigned      Incident[]       @relation("Assignee")
+  updates       IncidentUpdate[]
+  auditLogs     AuditLog[]
+  notifications Notification[]
+}
 
-    model IncidentUpdate{
-        id String @id @default(cuid())
-        incidentId String
-        authorId String
-        message String
-        fromStatus IncidentStatus?
-        toStatus IncidentStatus?
-        createdAt DateTime @default(now())
+model Incident {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  severity    Severity
+  status      IncidentStatus @default(OPEN)
+  service     String
+  reporterId  String
+  assigneeId  String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  resolvedAt  DateTime?
 
-        incident Incident @relation(fields: [incidentId], references: [id])
-        author User @relation(fields: [authorId], references: [id])
+  reporter      User             @relation("Reporter", fields: [reporterId], references: [id])
+  assignee      User?            @relation("Assignee", fields: [assigneeId], references: [id])
+  updates       IncidentUpdate[]
+  notifications Notification[]
 
+  @@index([status, severity])
+  @@index([service])
+  @@index([createdAt])
+}
 
-        @@index([incidentId, createdAt])
-    }
+model IncidentUpdate {
+  id         String          @id @default(cuid())
+  incidentId String
+  authorId   String
+  message    String
+  fromStatus IncidentStatus?
+  toStatus   IncidentStatus?
+  createdAt  DateTime        @default(now())
 
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  author   User     @relation(fields: [authorId], references: [id])
 
-    model AuditLog{
-        id String @id @default(cuid())
-        actorId String?
-        action String
-        entityType String
-        entityId String
-        metadata String
-        createdAt DateTime @default(now())
+  @@index([incidentId, createdAt])
+}
 
-        actor User? @relation(fields: [actorId], references: [id])
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String
+  entityType String
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
 
-        @@index([entityType,entityId])
-        @@index([createdAt])
-        }
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model Notification {
+  id         String             @id @default(cuid())
+  dedupeKey  String             @unique
+  userId     String
+  incidentId String
+  type       String
+  message    String
+  status     NotificationStatus @default(PENDING)
+  attempts   Int                @default(0)
+  error      String?
+  createdAt  DateTime           @default(now())
+  sentAt     DateTime?
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
