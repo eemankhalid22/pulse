@@ -107,3 +107,10 @@ Set `SIMULATE_FAILURE_RATE=1` in `apps/api/.env`, restart the worker, and report
 ## Next steps
 
 Slack/email delivery channels, per-service on-call rotation and escalation, SLA timers, rate limiting, OpenTelemetry tracing, CI pipeline.
+
+## images
+<img width="1868" height="864" alt="image" src="https://github.com/user-attachments/assets/09c93cba-a974-49d5-83b5-468e0d7aa463" />
+<img width="1874" height="877" alt="image" src="https://github.com/user-attachments/assets/a7da7a1e-9c78-439e-bb86-a54aedad1c33" />
+<img width="1860" height="871" alt="image" src="https://github.com/user-attachments/assets/d805496c-3286-4894-9dcd-d5281a4af9af" />
+
+
