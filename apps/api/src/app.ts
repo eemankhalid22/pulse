@@ -6,12 +6,17 @@ import { authRoutes } from "./routes/auth";
 import { incidentRoutes } from "./routes/incidents";
 import { notificationRoutes } from "./routes/notifications";
 import { statsRoutes } from "./routes/stats";
+import { env } from "./env";
 import type { AppEnv } from "./auth";
 
 export const app = new OpenAPIHono<AppEnv>();
 
+const origins = env.CORS_ORIGINS.split(",")
+  .map((s) => s.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+
 app.use("*", logger());
-app.use("*", cors({ origin: ["http://localhost:3000"], credentials: true }));
+app.use("*", cors({ origin: origins, credentials: true }));
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 

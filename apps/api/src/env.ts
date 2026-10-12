@@ -5,6 +5,7 @@ const schema = z.object({
   REDIS_URL: z.string().min(1),
   JWT_SECRET: z.string().min(32),
   PORT: z.coerce.number().default(3001),
+  CORS_ORIGINS: z.string().default("http://localhost:3000"),
   SIMULATE_FAILURE_RATE: z.coerce.number().min(0).max(1).default(0),
   WEBHOOK_URL: z.string().url().optional(),
 });

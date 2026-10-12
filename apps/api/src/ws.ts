@@ -2,10 +2,9 @@ import { createNodeWebSocket } from "@hono/node-ws";
 import { createMiddleware } from "hono/factory";
 import { verify } from "hono/jwt";
 import type { WSContext } from "hono/ws";
-import { Redis } from "ioredis";
 import { app } from "./app";
 import { env } from "./env";
-import { EVENTS_CHANNEL } from "./redis";
+import { EVENTS_CHANNEL, createRedis } from "./redis";
 import type { AppEnv } from "./auth";
 
 export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({
@@ -53,9 +52,8 @@ app.get(
   }),
 );
 
-// One Redis subscriber per API process fans events out to local sockets,
-// so this scales horizontally: every API instance receives every event.
-const sub = new Redis(env.REDIS_URL);
+// One Redis subscriber per API process fans events out to local sockets
+const sub = createRedis();
 sub.on("error", (err) => console.error("[redis:sub]", err.message));
 sub.subscribe(EVENTS_CHANNEL).catch((err) => console.error("[redis:sub]", err));
 
