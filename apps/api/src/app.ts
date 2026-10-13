@@ -16,8 +16,23 @@ const origins = env.CORS_ORIGINS.split(",")
   .filter(Boolean);
 
 app.use("*", logger());
-app.use("*", cors({ origin: origins, credentials: true }));
+app.use(
+  "*",
+  cors({
+    origin: (origin) => {
+      const normalized = origin.replace(/\/$/, "");
 
+      if (origins.includes(normalized)) {
+        return normalized;
+      }
+
+      return undefined;
+    },
+    credentials: true,
+    allowMethods: ["GET", "HEAD", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.get("/health", (c) => c.json({ status: "ok" }));
 
 app.route("/", authRoutes);
