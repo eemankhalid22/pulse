@@ -69,15 +69,14 @@ type Stats = {
   }[];
   feed: FeedItem[];
 };
-
 type Tile = { bg: string; fg: string };
 const SEV_TILE: Record<string, Tile> = {
-  SEV1: { bg: "#f0d5cd", fg: "#b23a2e" },
-  SEV2: { bg: "#f2dfc8", fg: "#b8601c" },
-  SEV3: { bg: "#e0dcf0", fg: "#6a58b8" },
-  SEV4: { bg: "#d6e3f0", fg: "#2f6aa8" },
+  SEV1: { bg: "var(--s1-bg)", fg: "var(--s1-fg)" },
+  SEV2: { bg: "var(--s2-bg)", fg: "var(--s2-fg)" },
+  SEV3: { bg: "var(--s3-bg)", fg: "var(--s3-fg)" },
+  SEV4: { bg: "var(--s4-bg)", fg: "var(--s4-fg)" },
 };
-const DONE_TILE: Tile = { bg: "#d6e8dc", fg: "#2f7d59" };
+const DONE_TILE: Tile = { bg: "var(--ok-bg)", fg: "var(--ok-fg)" };
 const AVATAR_TILES: Tile[] = [
   SEV_TILE.SEV3,
   DONE_TILE,
